@@ -7,6 +7,8 @@
 `sql>
 select count(*) as total_connections  from pg_stat_activity;
 `
+
+
 2. The values of connection pooling should be
 : min = no of cores
 : max = 2 * no of cores + (no of disk) , After this the transaction per seconds [throttles](https://github.com/brettwooldridge/HikariCP/wiki/About-Pool-Sizing)
