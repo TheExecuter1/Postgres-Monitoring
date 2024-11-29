@@ -44,10 +44,13 @@ select count(*) as total_connections  from pg_stat_activity;
    It will keep adding new logs while keeping old unused one.
 
 
-   Diagnose this 
-       - Run `shell> du -sh /bitnami/postgresql/data/pg_wal`.
-       - Run `sql> SELECT pg_size_pretty(pg_database_size(current_database())) AS database_size;`.
-       - IF  wal/db is very high, replication is most likely the issue.
+   Diagnose this:
+   
+   - Run `shell> du -sh /bitnami/postgresql/data/pg_wal`.
+
+   - Run `sql> SELECT pg_size_pretty(pg_database_size(current_database())) AS database_size;`.
+
+   - IF  wal/db is very high, replication is most likely the issue.
 
    
    Resolution :
