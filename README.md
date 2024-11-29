@@ -1,4 +1,4 @@
-## This contains some issues and learnings I faced while keeping Postgres DB up and running. Feel Free to add yours! 
+## This contains some issues and learnings I faced while keeping Postgres DB up and running. Feel Free to add yours and rectify mine :) 
 
 
 ### Connection Pooling
