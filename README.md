@@ -41,10 +41,18 @@ select count(*) as total_connections  from pg_stat_activity;
    
 2. DISK Space bloating **WAL**
    Sometimes improperly configured logical replication can fill up DB with wal log files.
-    It will keep adding new logs while keeping old unused one. Diagnose this 
+   It will keep adding new logs while keeping old unused one.
+
+
+   Diagnose this:
+   
        - Run `shell> du -sh /bitnami/postgresql/data/pg_wal`
+   
        - Run `sql> SELECT pg_size_pretty(pg_database_size(current_database())) AS database_size;`
-       - IF  wal/db is very high, replication is most likely the issue. 
+   
+       - IF  wal/db is very high, replication is most likely the issue.
+
+   
    Resolution :
        - Check for the inactive slots `sql> SELECT * FROM pg_replication_slots;`
        - Remove the inactive slots `sql> SELECT pg_drop_replication_slot('<slot_name>');`
@@ -58,7 +66,7 @@ select count(*) as total_connections  from pg_stat_activity;
           `SHOW wal_keep_size;
           SHOW max_wal_size;
           SHOW min_wal_size;`
-3. Monitor WAL using the 'bgwriter' view
+4. Monitor WAL using the 'bgwriter' view
     `sql> SELECT * FROM pg_stat_bgwriter;`
 
 
