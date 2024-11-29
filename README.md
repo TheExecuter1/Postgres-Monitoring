@@ -21,11 +21,11 @@ select count(*) as total_connections  from pg_stat_activity;
     Verify this by checking the time of spike and release with Vacuum timings using
 
     `sql>
-    SELECT relname AS table_name, 
-       last_vacuum AT TIME ZONE 'UTC' AT TIME ZONE 'Asia/Kolkata' AS last_vacuum_in_kolkata, 
-       last_autovacuum AT TIME ZONE 'UTC' AT TIME ZONE 'Asia/Kolkata' AS last_autovacuum_in_kolkata
+    select relname AS table_name, 
+       last_vacuum AT TIME ZONE 'UTC' AT TIME ZONE 'Asia/Kolkata' AS last_vacuum_ist, 
+       last_autovacuum AT TIME ZONE 'UTC' AT TIME ZONE 'Asia/Kolkata' AS last_autovacuum_ist
         FROM pg_stat_user_tables
-        ORDER BY last_vacuum_in_kolkata DESC NULLS LAST;
+        ORDER BY last_vacuum_ist DESC NULLS LAST;
     `
 
    
@@ -39,7 +39,7 @@ select count(*) as total_connections  from pg_stat_activity;
     - `shell> df -h` to see over all disk usage for the container
     - Move around and use `du -sh <dir>` to see usage
    
-2. DISK Space bloating **WAL**
+2. DISK Space bloating due to **WAL**
    Sometimes improperly configured logical replication can fill up DB with wal log files.
    It will keep adding new logs while keeping old unused one.
 
@@ -53,27 +53,28 @@ select count(*) as total_connections  from pg_stat_activity;
    - IF  wal/db is very high, replication is most likely the issue.
 
    
-   Resolution :
+   Resolution:
    
-       - Check for the inactive slots `sql> SELECT * FROM pg_replication_slots;`
-   
-       - Remove the inactive slots `sql> SELECT pg_drop_replication_slot('<slot_name>');`
-   
-       - Run `sql> checkpoint` [Checkpoint](https://www.cybertec-postgresql.com/en/postgresql-what-is-a-checkpoint/)
+   - Check for the inactive slots `sql> SELECT * FROM pg_replication_slots;`
+
+   - Remove the inactive slots `sql> SELECT pg_drop_replication_slot('<slot_name>');`
+
+   - Run `sql> checkpoint` [Checkpoint](https://www.cybertec-postgresql.com/en/postgresql-what-is-a-checkpoint/)
    
    Other Causes:
-       - Check if postgres is archiving the logs using `sql> archive_mode`, if its 'ON' could be an issue.
    
-       - If there is master-slave replication enabled check if the replica is lagging behind.
-         This may cause unwarranted writes. Run this in master to verify
-   
-         `sql> SELECT application_name, pg_wal_lsn_diff(sent_lsn, replay_lsn) AS replication_lag FROM pg_stat_replication;`
+   - Check if Postgres is archiving the logs using `sql> archive_mode`, if its 'ON' could be an issue.
+
+   - If there is master-slave replication enabled check if the replica is lagging.
+     This may cause unwarranted writes. Run this in master to verify
+
+     `sql> SELECT application_name, pg_wal_lsn_diff(sent_lsn, replay_lsn) AS replication_lag FROM pg_stat_replication;`
 
    
    - Other important variables to help diagnose this issue
-          `sql>SHOW wal_keep_size;`
-          `sql>SHOW max_wal_size;`
-          `sql>SHOW min_wal_size;`
+      `sql>SHOW wal_keep_size;`
+      `sql>SHOW max_wal_size;`
+      `sql>SHOW min_wal_size;`
 
      
 4. Monitor WAL using the 'bgwriter' view
