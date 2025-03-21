@@ -82,6 +82,40 @@ select count(*) as total_connections  from pg_stat_activity;
     `sql> SELECT * FROM pg_stat_bgwriter;`
 
 
+### READ REPLICA HOT_STANDBY:
+
+Issue - When a heavy query runs on replica DB, it locks the table while the 'read' happens.
+Meanwhile the master sends changes to the locked table which causes conflicts.
+This error appears
+
+```text
+psycopg2.errors.SerializationFailure: canceling statement due to conflict with recovery
+DETAIL:  User was holding shared buffer pin for too long.
+```
+
+Solution->
+Enable [hot_standby_feedback](https://postgresqlco.nf/doc/en/param/hot_standby_feedback/)
+
+Steps ->
+
+1. Make a postgres config file (.conf) , parallel to docker compose and in it write
+
+```shell
+hot_standby_feedback = on
+```
+
+2. Mount the file on the volume
+```text
+volumes:
+        - ./hot_standby.conf:/opt/bitnami/postgresql/conf/conf.d/hot_standby.conf:ro
+```
+3. Recreate the container and check if standby is enabled using 
+```sql
+show hot_standby_feedback;
+```
+
+
+
 
 
 
